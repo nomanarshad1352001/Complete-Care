@@ -1,0 +1,26 @@
+/** Practice-wide contact + link constants (sourced from complete-care.com). */
+export const SITE = {
+  name: "Complete Care",
+  tagline: "Injury care across Central Florida",
+  phoneDisplay: "(844) 699-2273",
+  phoneHref: "tel:8446992273",
+  fax: "(407) 801-2000",
+  locationsBlurb: "30+ neighborhood clinics across Central Florida",
+  hoursEn: "Mon–Fri, 7:30 AM – 6:00 PM",
+  hoursEs: "Lun–Vie, 7:30 AM – 6:00 PM",
+  portalUrl: "https://mycw189.ecwcloud.com/portal24259/jsp/100mp/login_otp.jsp",
+  external: {
+    home: "https://www.complete-care.com/",
+    locations: "https://www.complete-care.com/locations/",
+    services: "https://www.complete-care.com/treatment-and-services/",
+    about: "https://www.complete-care.com/about/",
+    contact: "https://www.complete-care.com/contact-us/",
+    schedule: "https://www.complete-care.com/schedule-appointment/",
+    reviews: "https://www.complete-care.com/patient-reviews/",
+    blog: "https://www.complete-care.com/blog/",
+    accessibility: "https://www.complete-care.com/accessibility/",
+    injuries: "https://www.complete-care.com/injuries/",
+    faq: "https://www.complete-care.com/frequently-asked-questions/",
+    billing: "https://www.complete-care.com/no-surprise-billing/",
+  },
+} as const;

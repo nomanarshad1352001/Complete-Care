@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+@theme {
+  /* Complete Care brand palette (from official logo) */
+  --color-brand: #00abe5;
+  --color-brand-deep: #0085b8;
+  --color-brand-ink: #00587a;
+  --color-brand-faint: #e6f7fd;
+  --color-accent: #85c440;
+  --color-accent-deep: #67a32c;
+  --color-ink: #333336;
+  --color-ink-soft: #4d4d4f;
+  --color-navy: #07293c;
+  --color-navy-deep: #051e2c;
+  --color-mist: #f4f9fc;
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-ink font-sans antialiased;
+}
+
+::selection {
+  background: #00abe5;
+  color: #fff;
+}
+
+/* Accessible focus ring everywhere */
+:focus-visible {
+  outline: 3px solid #00abe5;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Subtle medical cross texture for dark hero panels */
+.hero-pattern {
+  background-color: #06293c;
+  background-image:
+    radial-gradient(1100px 500px at 85% -10%, rgba(0, 171, 229, 0.28), transparent 60%),
+    radial-gradient(900px 480px at -10% 110%, rgba(133, 196, 64, 0.16), transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cpath d='M32 26h8v6h6v8h-6v6h-8v-6h-6v-8h6z' fill='%23ffffff' fill-opacity='0.035'/%3E%3C/svg%3E");
+}
+
+/* Soft diagonal texture for light sections */
+.mist-pattern {
+  background-color: #f4f9fc;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(0, 133, 184, 0.08) 1px,
+    transparent 0
+  );
+  background-size: 22px 22px;
+}
+
+/* Reading rhythm for instruction sheets */
+.reader p {
+  line-height: 1.75;
+}
+
+/* Card entrance */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise {
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .rise {
+    animation: none;
+  }
+}
+
+/* ---------- Print stylesheet: instruction sheets ---------- */
+@media print {
+  @page {
+    margin: 2cm 1.8cm;
+  }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    font-size: 11pt;
+  }
+  .no-print,
+  header.site-header,
+  footer.site-footer {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .print-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+    color: #000 !important;
+  }
+  li {
+    break-inside: avoid;
+  }
+  .avoid-break {
+    break-inside: avoid;
+  }
+  a {
+    color: #000 !important;
+    text-decoration: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+}
+
+.print-only {
+  display: none;
+}
