@@ -52,6 +52,23 @@ type Lang = keyof typeof LABELS;
 
 export async function GET(
   request: NextRequest,
+  ctx: { params: Promise<{ slug: string }> }
+) {
+  try {
+    return await buildPdf(request, ctx);
+  } catch (err) {
+    // pdfkit is fs-dependent; a serverless misconfiguration should fail loudly
+    // in the logs but never leave the patient with a blank page.
+    console.error("[pdf] generation failed:", err);
+    return new Response(
+      "Sorry — the PDF could not be generated right now. Please try again, or call (844) 699-2273 and we will send you a printed copy.",
+      { status: 500, headers: { "Content-Type": "text/plain" } }
+    );
+  }
+}
+
+async function buildPdf(
+  request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   const { slug } = await params;

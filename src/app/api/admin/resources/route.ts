@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
-import { db } from "@/db";
 import { resources } from "@/db/schema";
+import { getDb } from "@/lib/resources/queries";
 import { CATEGORIES } from "@/lib/resources/categories";
+import { RESOURCE_LIBRARY } from "@/content/resources";
 
 export const dynamic = "force-dynamic";
 
@@ -45,14 +46,33 @@ function validate(p: Payload): string[] {
   return errors;
 }
 
+async function requireDb() {
+  const db = await getDb();
+  if (!db) {
+    return {
+      error: NextResponse.json(
+        {
+          errors: [
+            "No database is configured for this deployment, so edits cannot be saved. The public library is being served from the bundled content and continues to work normally. Set DATABASE_URL (for example a Vercel Postgres / Neon connection string) to enable the staff CMS.",
+          ],
+        },
+        { status: 503 }
+      ),
+    };
+  }
+  return { db };
+}
+
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as Payload;
   const errors = validate(body);
-  if (errors.length) {
-    return NextResponse.json({ errors }, { status: 400 });
-  }
+  if (errors.length) return NextResponse.json({ errors }, { status: 400 });
+
+  const guard = await requireDb();
+  if ("error" in guard) return guard.error;
+
   try {
-    await db.insert(resources).values({
+    await guard.db.insert(resources).values({
       slug: body.slug!,
       category: body.category!,
       titleEn: body.titleEn!,
@@ -84,11 +104,13 @@ export async function PUT(request: NextRequest) {
   const body = (await request.json()) as Payload;
   const errors = validate(body);
   if (!body.originalSlug) errors.push("originalSlug is required.");
-  if (errors.length) {
-    return NextResponse.json({ errors }, { status: 400 });
-  }
+  if (errors.length) return NextResponse.json({ errors }, { status: 400 });
+
+  const guard = await requireDb();
+  if ("error" in guard) return guard.error;
+
   try {
-    const updated = await db
+    const updated = await guard.db
       .update(resources)
       .set({
         slug: body.slug!,
@@ -107,6 +129,7 @@ export async function PUT(request: NextRequest) {
       })
       .where(eq(resources.slug, body.originalSlug!))
       .returning({ slug: resources.slug });
+
     if (!updated.length) {
       return NextResponse.json(
         { errors: ["Resource not found."] },
@@ -119,4 +142,13 @@ export async function PUT(request: NextRequest) {
     console.error("update resource failed:", err);
     return NextResponse.json({ errors: [msg] }, { status: 500 });
   }
+}
+
+/** Simple inventory endpoint used by the CMS dashboard. */
+export async function GET() {
+  const db = await getDb();
+  return NextResponse.json({
+    databaseConfigured: db !== null,
+    bundledCount: RESOURCE_LIBRARY.length,
+  });
 }

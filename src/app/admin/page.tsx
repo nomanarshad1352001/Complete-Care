@@ -7,8 +7,13 @@ import {
   ShieldCheck,
   Star,
 } from "lucide-react";
-import { getAllResourceSummaries, formatReviewedDate } from "@/lib/resources/queries";
+import {
+  getAllResourceSummaries,
+  formatReviewedDate,
+  databaseIsConfigured,
+} from "@/lib/resources/queries";
 import { CATEGORIES } from "@/lib/resources/categories";
+import { Database, HardDriveDownload } from "lucide-react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -19,7 +24,10 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  const resources = await getAllResourceSummaries();
+  const [resources, hasDb] = await Promise.all([
+    getAllResourceSummaries(),
+    databaseIsConfigured(),
+  ]);
   const grouped = CATEGORIES.map((c) => ({
     category: c,
     items: resources
@@ -53,6 +61,29 @@ export default async function AdminPage() {
             New guide
           </Link>
         </div>
+
+        {/* Deployment mode notice */}
+        {hasDb ? (
+          <p className="mt-6 flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50 p-4 text-sm font-semibold text-green-800">
+            <Database className="h-5 w-5 shrink-0" aria-hidden />
+            Connected to the database — edits save and publish to the website
+            and both PDF handouts.
+          </p>
+        ) : (
+          <p className="mt-6 flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
+            <HardDriveDownload className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
+            <span>
+              <strong className="font-bold">
+                Browsing the bundled library.
+              </strong>{" "}
+              This deployment has no <code>DATABASE_URL</code>, so all{" "}
+              {resources.length} guides, search, and PDF downloads work
+              read-only from the files shipped with the app. Add a{" "}
+              <code>DATABASE_URL</code> environment variable to turn on saving
+              and the staff editor.
+            </span>
+          </p>
+        )}
 
         {/* How-to */}
         <div className="mt-6 flex items-start gap-3 rounded-2xl border border-brand/25 bg-brand-faint p-4 text-sm leading-relaxed text-brand-ink">
